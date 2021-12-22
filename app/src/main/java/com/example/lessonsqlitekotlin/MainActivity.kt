@@ -17,10 +17,15 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        myDbManager.closeDb()
+    }
+
     override fun onResume(){
         super.onResume()
         myDbManager.openDb()
-        val dataList = myDbManager.readDbData()
+        // val dataList = myDbManager.readDbData()
     }
 
 
@@ -29,8 +34,4 @@ class MainActivity : AppCompatActivity() {
         startActivity(i)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        myDbManager.closeDb()
-    }
 }
