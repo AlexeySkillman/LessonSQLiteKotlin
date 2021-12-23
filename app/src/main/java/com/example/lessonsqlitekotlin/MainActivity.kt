@@ -5,16 +5,21 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.lessonsqlitekotlin.db.MyAdapter
 import com.example.lessonsqlitekotlin.db.MyDbManager
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     val myDbManager = MyDbManager(this)
+    val myAdapter = MyAdapter(ArrayList())
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        init()
     }
 
     override fun onDestroy() {
@@ -25,13 +30,22 @@ class MainActivity : AppCompatActivity() {
     override fun onResume(){
         super.onResume()
         myDbManager.openDb()
-        // val dataList = myDbManager.readDbData()
+        fillAdapter()
     }
 
 
     fun onClickNew(view: View){
         val i  = Intent(this, EditActivity::class.java)
         startActivity(i)
+    }
+
+    fun init(){
+        rcView.layoutManager = LinearLayoutManager(this)
+        rcView.adapter = myAdapter
+    }
+
+    fun fillAdapter(){
+        myAdapter.updateAdapter(myDbManager.readDbData())
     }
 
 }
