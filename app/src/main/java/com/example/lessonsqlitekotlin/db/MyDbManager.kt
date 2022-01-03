@@ -21,8 +21,8 @@ class MyDbManager(val context: Context) {
         db?.insert(MyDbNameClass.TABLE_NAME,null,values)
     }
 
-    fun readDbData() : ArrayList<String>{
-        val dataList = ArrayList<String>()
+    fun readDbData() : ArrayList<ListItem>{
+        val dataList = ArrayList<ListItem>()
         val cursor = db?.query(
             MyDbNameClass.TABLE_NAME,
             null,
@@ -33,9 +33,18 @@ class MyDbManager(val context: Context) {
             null
         )
 
-        while(cursor?.moveToNext()!!){
-            val dataText = cursor.getString(cursor.getColumnIndexOrThrow(MyDbNameClass.COLUMN_NAME_TITLE))
-            dataList.add(dataText.toString())
+        while (cursor?.moveToNext()!!) {
+            val dataText =
+                cursor.getString(cursor.getColumnIndexOrThrow(MyDbNameClass.COLUMN_NAME_TITLE))
+            val dataContent =
+                cursor.getString(cursor.getColumnIndexOrThrow(MyDbNameClass.COLUMN_NAME_CONTENT))
+            val dataUri =
+                cursor.getString(cursor.getColumnIndexOrThrow(MyDbNameClass.COLUMN_NAME_IMAGE_URI))
+            val item = ListItem()
+            item.title = dataText
+            item.desc = dataContent
+            item.uri = dataUri
+            dataList.add(item)
         }
 
         cursor.close()

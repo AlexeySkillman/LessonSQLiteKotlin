@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     val myDbManager = MyDbManager(this)
-    val myAdapter = MyAdapter(ArrayList())
+    val myAdapter = MyAdapter(ArrayList(), this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +45,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun fillAdapter(){
-        myAdapter.updateAdapter(myDbManager.readDbData())
+        val list = myDbManager.readDbData()
+        myAdapter.updateAdapter(list)
+        if(list.size > 0){
+            tvNoElements.visibility = View.GONE
+        }
     }
 
 }
