@@ -9,6 +9,9 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="dark_blue">#243177</color>
-    <color name="dark_bg">#FFE494</color>
+    <color name="dark_bg">#676767</color>
     <color name="gray">#7E7E7E</color>
+    <color name="blue_dark">#324083</color>
+    <color name="edit_text_dark">#1C2449</color>
+    <color name="light_color">#C4C4C4</color>
 </resources>

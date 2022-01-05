@@ -3,6 +3,11 @@ package com.example.lessonsqlitekotlin.db
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.provider.BaseColumns
+import android.text.TextUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
 
 class MyDbManager(val context: Context) {
     val myDbHelper = MyDbHelper(context)
@@ -11,23 +16,45 @@ class MyDbManager(val context: Context) {
     fun openDb(){
         db = myDbHelper.writableDatabase
     }
-    fun insertToDb( title: String, content: String, uri: String){
+
+    suspend fun insertToDb( title: String, content: String, uri: String, time: String) = withContext(Dispatchers.IO){
         val values =ContentValues().apply {
             put(MyDbNameClass.COLUMN_NAME_TITLE, title)
             put(MyDbNameClass.COLUMN_NAME_CONTENT, content)
             put(MyDbNameClass.COLUMN_NAME_IMAGE_URI, uri)
+            put(MyDbNameClass.COLUMN_NAME_TIME, time)
 
         }
         db?.insert(MyDbNameClass.TABLE_NAME,null,values)
     }
 
-    fun readDbData() : ArrayList<ListItem>{
+    //  id: String или  id: Int
+    suspend fun updateToDb( title: String, content: String, uri: String, id: Int, time: String) = withContext(Dispatchers.IO){
+        val selection = BaseColumns._ID + "=$id"
+        val values =ContentValues().apply {
+            put(MyDbNameClass.COLUMN_NAME_TITLE, title)
+            put(MyDbNameClass.COLUMN_NAME_CONTENT, content)
+            put(MyDbNameClass.COLUMN_NAME_IMAGE_URI, uri)
+            put(MyDbNameClass.COLUMN_NAME_TIME, time)
+
+        }
+        db?.update(MyDbNameClass.TABLE_NAME, values, selection, null)
+    }
+
+    fun removeItemFromDb( id: String){
+        val selection = BaseColumns._ID + "=$id"
+        db?.delete(MyDbNameClass.TABLE_NAME,selection,null)
+    }
+
+
+    suspend fun readDbData(searchText: String) : ArrayList<ListItem> = withContext(Dispatchers.IO){
         val dataList = ArrayList<ListItem>()
+        val selection = "${MyDbNameClass.COLUMN_NAME_TITLE} like ?"
         val cursor = db?.query(
             MyDbNameClass.TABLE_NAME,
             null,
-            null,
-            null,
+            selection,
+            arrayOf("%$searchText%"),
             null,
             null,
             null
@@ -40,15 +67,21 @@ class MyDbManager(val context: Context) {
                 cursor.getString(cursor.getColumnIndexOrThrow(MyDbNameClass.COLUMN_NAME_CONTENT))
             val dataUri =
                 cursor.getString(cursor.getColumnIndexOrThrow(MyDbNameClass.COLUMN_NAME_IMAGE_URI))
+            val dataId =
+                cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID))
+            val time =
+                cursor.getString(cursor.getColumnIndexOrThrow(MyDbNameClass.COLUMN_NAME_TIME))
             val item = ListItem()
             item.title = dataText
             item.desc = dataContent
             item.uri = dataUri
+            item.id = dataId
+            item.time = time
             dataList.add(item)
         }
 
         cursor.close()
-        return dataList
+        return@withContext dataList
     }
 
     fun closeDb(){
